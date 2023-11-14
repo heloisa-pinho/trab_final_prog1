@@ -108,14 +108,15 @@ struct base cria_base(int ID){
     return b;
 }
 
-struct missao cria_missao(int ID){
+struct missao cria_missao(int ID,struct *m){
 
-    struct missao m;
+    struct missao ms;
    
-    m.ID = ID;
-    m.hab = cria_cjt(aleat(6,10));
-    m.local.x = aleat(0,N_TAMANHO_MUNDO - 1);
-    m.local.y = aleat(0,N_TAMANHO_MUNDO - 1);
+    ms.ID = ID;
+    ms.hab = cria_cjt(aleat(6,10));
+    ms.hab = cria_subcjt_cjt(m->hab,cardinalidade_cjt(ms.hab));
+    ms.local.x = aleat(0,N_TAMANHO_MUNDO - 1);
+    ms.local.y = aleat(0,N_TAMANHO_MUNDO - 1);
    
     return m;
 }        
@@ -407,6 +408,30 @@ void viaja(int T,int H,int B,struct mundo *m){
     ev = cria_evento(chega,EV_CHEGA,H,B);
     insere_lef(m->linha_do_tempo,ev);
 }
+
+struct base BMP(struct missao *ms,struct *m){
+
+    struct base BMP;
+    int i,d_BMP,aux;
+    
+    BMP = m->b.[0];
+    d_MPB = distancia_cartesiana(ms->local,m->b[0].local);
+    
+    for (i = 1, i < m->bases; i++){
+        aux = distancia_cartesiana(ms->local,m->b[i].local); 
+        if  (aux < d_BMP){
+            d_BMP = aux;
+            BMP = m->b[i];
+        }
+    }
+    
+    return BMP;
+}
+
+int missao (struct  mundo *m){
+
+    
+       
            
 int main (){
    

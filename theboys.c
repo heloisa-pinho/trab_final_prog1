@@ -448,39 +448,53 @@ int pos_menor(int *v[],int max){
     return pos_menor;
     
 }    
+
+int encontra_base (struct mundo *m,struct missao ms,int pos_menor,){
+
+    struct conjunto *uniao,*aux;
     
+    printf("%6d: MISSAO %d HAB BASE %d:",T,MS,pos_menor);
+            imprime_cjt(*uniao);
+
+     while (pos_menor != NULO){   
+        BMP = m->b[pos_menor];
+        inicia_iterador_cjt(BMP);
+          
+        while(incrementa_iterador_cjt(BPM,&H){
+            aux = m->h[H]->hab;
+            uniao = uniao_cjt(uniao,aux);
+            destroi_cjt(aux);
+        }
+        if (contido_cjt(ms.hab,uniao))
+            return pos_menor; 
+        
+        
+    } 
+
+
+   
 void missao (int T,int MS,struct  mundo *m){
 
-    int v[m->bases],i,H;
+    int v[m->bases],i,H,pos_menor;
     struct missao ms;
     struct base *BMP;
-    struct conjunto *uniao,*aux;
+    
     H = 0;
+    ms = m->ms[MS];
     
     printf("%6d: MISSAO %d HAB REQ: ",T,MS,);
     impime_cjt(ms->hab);
-       
+    
+     
     for(i = 0,i < m->bases,i++)
-        v[i] = distancia_cartesiana(m->ms[MS].local,m->b[i].local);
+        v[i] = distancia_cartesiana(ms.local,m->b[i].local);
     
     pos_menor = pos_menor(&v,m->bases);
     
     if (pos_menor == NULO)
-        printf("%6d: MISSAO %d IMPOSSIVEL \n",T,MS);
+        printf("%6d: MISSAO %d IMPOSSIVEL \n",T,MS)
+    else
         
-    BMP = m->b[pos_menor];
-    inicia_iterador_cjt(BMP);
-      
-    while(incrementa_iterador_cjt(BPM,&H){
-        aux = m->h[H]->hab;
-        uniao = uniao_cjt(uniao,aux);
-        destroi_cjt(aux);
-    }
-       
-    printf("%6d: MISSAO %d HAB BASE %d:",T,MS,pos_menor);
-        imprime_cjt( 
-    
-    
 
     
        

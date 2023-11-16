@@ -56,7 +56,7 @@ struct mundo {
     int bases;
     struct base b[N_BASES];
     int missoes;
-    struct missao m[N_MISSOES];
+    struct missao ms[N_MISSOES];
     int habilidades;
     struct conjunto *hab;
     struct lef_t *linha_do_tempo;
@@ -152,7 +152,7 @@ struct mundo cria_mundo (){
    
     m.missoes = N_MISSOES;
     for (i = 0; i < m.missoes; i++)
-        m.m[i] = cria_missao(i);
+        m.ms[i] = cria_missao(i,&m);
        
     m.linha_do_tempo = cria_lef();
    
@@ -409,7 +409,7 @@ void viaja(int T,int H,int B,struct mundo *m){
     insere_lef(m->linha_do_tempo,ev);
 }
 
-struct base BMP(struct missao *ms,struct *m){
+/*struct base BMP(struct missao *ms,struct *m){
 
     struct base BMP;
     int i,d_BMP,aux;
@@ -426,9 +426,61 @@ struct base BMP(struct missao *ms,struct *m){
     }
     
     return BMP;
-}
+}*/
 
-int missao (struct  mundo *m){
+int pos_menor(int *v[],int max){
+
+    int pos_menor,i;
+    
+    pos_menor = 0;
+    
+    while ((pos_menor < max) && (v[pos_menor] == NULO))
+        pos_menor++;
+        
+    if (posicao_menor == max)
+        return NULO;
+        
+    for (i = pos_menor + 1, i < max,i++){
+        if ((v[i] < v[pos_menor]) && (v[i] != NULO))
+            pos_menor = i;
+    }
+    
+    return pos_menor;
+    
+}    
+    
+void missao (int T,int MS,struct  mundo *m){
+
+    int v[m->bases],i,H;
+    struct missao ms;
+    struct base *BMP;
+    struct conjunto *uniao,*aux;
+    H = 0;
+    
+    printf("%6d: MISSAO %d HAB REQ: ",T,MS,);
+    impime_cjt(ms->hab);
+       
+    for(i = 0,i < m->bases,i++)
+        v[i] = distancia_cartesiana(m->ms[MS].local,m->b[i].local);
+    
+    pos_menor = pos_menor(&v,m->bases);
+    
+    if (pos_menor == NULO)
+        printf("%6d: MISSAO %d IMPOSSIVEL \n",T,MS);
+        
+    BMP = m->b[pos_menor];
+    inicia_iterador_cjt(BMP);
+      
+    while(incrementa_iterador_cjt(BPM,&H){
+        aux = m->h[H]->hab;
+        uniao = uniao_cjt(uniao,aux);
+        destroi_cjt(aux);
+    }
+       
+    printf("%6d: MISSAO %d HAB BASE %d:",T,MS,pos_menor);
+        imprime_cjt( 
+    
+    
 
     
        

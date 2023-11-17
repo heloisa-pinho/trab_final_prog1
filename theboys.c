@@ -113,8 +113,7 @@ struct missao cria_missao(int ID,struct mundo*m){
     struct missao ms;
    
     ms.ID = ID;
-    ms.hab = cria_cjt(aleat(6,10));
-    ms.hab = cria_subcjt_cjt(m->hab,cardinalidade_cjt(ms.hab));
+    ms.hab = cria_subcjt_cjt(m->hab,aleat(6,10));
     ms.local.x = aleat(0,N_TAMANHO_MUNDO - 1);
     ms.local.y = aleat(0,N_TAMANHO_MUNDO - 1);
    
@@ -243,6 +242,9 @@ void destroi_mundo(struct mundo *m){
    
     /*destroi conjunto hab mundo*/  
     destroi_cjt(m->hab);
+    
+    destroi_lef(m->linha_do_tempo);
+    
 }
        
        
@@ -430,42 +432,49 @@ int posicao_menor(int v[],int max){
     
 }    
 
-int encontra_base (struct mundo *m,struct missao ms,int v[],int MS,int T){
+int encontra_base (struct mundo *m,struct missao ms,int MS,int T){
 
     struct conjunto *uniao,*aux;
     struct base BMP;
-    int pos_menor,H;
+    int pos_menor,H,v[m->bases],i;
     
     H = 0;
     
+    for(i = 0;i < m->bases;i++)
+        v[i] = distancia_cartesiana(ms.local,m->b[i].local);
+        
     pos_menor = posicao_menor(v,m->bases);
-
+    
     while (pos_menor != NULO){   
         BMP = m->b[pos_menor];
         inicia_iterador_cjt(BMP.presente);
+        uniao = cria_cjt(m->habilidades);
              
         while(incrementa_iterador_cjt(BMP.presente,&H)){
-            aux = m->h[H].hab;
-            uniao = uniao_cjt(uniao,aux);
-            destroi_cjt(aux);
+            aux = uniao;
+            uniao = uniao_cjt(aux,m->h[H].hab);
+            aux = destroi_cjt(aux);
         }
         
         printf("%6d: MISSAO %d HAB BASE %d:",T,MS,pos_menor);
         imprime_cjt(uniao); 
         
-        if (contido_cjt(ms.hab,uniao))
-           return pos_menor; 
+        if (contido_cjt(ms.hab,uniao)){
+            uniao = destroi_cjt(uniao);
+            return pos_menor;
+        }
         
-        v[pos_menor] = NULO;
+        v[pos_menor] = NULO;    
+        uniao = destroi_cjt(uniao);
         pos_menor = posicao_menor(v,m->bases);
     } 
-
+    
     return NULO;
 }
    
 void missao (int T,int MS,struct  mundo *m){
 
-    int v[m->bases],i,BMP,H;
+    int BMP,H;
     struct missao ms;
     struct evento_t *ev;
     
@@ -476,10 +485,9 @@ void missao (int T,int MS,struct  mundo *m){
     imprime_cjt(ms.hab);
     
      
-    for(i = 0;i < m->bases;i++)
-        v[i] = distancia_cartesiana(ms.local,m->b[i].local);
     
-    BMP = encontra_base(m,ms,v,MS,T);
+    
+    BMP = encontra_base(m,ms,MS,T);
     
     if (BMP == NULO){
         ev = cria_evento(T,EV_MISSAO,NULO,NULO);
@@ -541,7 +549,7 @@ int main (){
                 m.relogio = ev->tempo;
                 missao(ev->tempo,ev->dado1,&m);
         }
-        destroi_evento(ev);
+        ev = destroi_evento(ev);
     }
     destroi_mundo(&m);
     return 0;

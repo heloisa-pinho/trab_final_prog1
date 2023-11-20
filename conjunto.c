@@ -119,7 +119,7 @@ int retira_cjt (struct conjunto *c, int elemento){
    
     int i;
      
-    for (i = busca_binaria(c,elemento); i<=c->card; i++)
+    for (i = busca_binaria(c,elemento); i < c->card; i++)
         c->v[i] = c->v[i+1];
    
     c->card = c->card - 1;
@@ -317,7 +317,7 @@ void imprime_cjt (struct conjunto *c){
     if (c->card != 0)
     printf("%d", c->v[c->card]);
     
-    printf("]\n");
+    printf(" ]\n");
 }        
 
 void inicia_iterador_cjt (struct conjunto *c){

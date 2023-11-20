@@ -6,11 +6,11 @@
 #include <math.h>
 
 #define T_INICIO 0
-#define T_FIM_DO_MUNDO 10000
+#define T_FIM_DO_MUNDO 525600
 #define N_TAMANHO_MUNDO 20000
-#define N_HABILIDADES 5
+#define N_HABILIDADES 10
 #define N_HEROIS N_HABILIDADES * 5
-#define N_BASES N_HEROIS/8
+#define N_BASES N_HEROIS/6
 #define N_MISSOES T_FIM_DO_MUNDO / 100
 #define NULO -1
 #define EV_CHEGA 0
@@ -103,7 +103,7 @@ struct base cria_base(int ID){
     b.local.x = aleat(0,N_TAMANHO_MUNDO - 1);
     b.local.y = aleat(0,N_TAMANHO_MUNDO - 1);
     b.lot = aleat(3,10);
-    b.presente = cria_cjt(b.lot + 1);//perguntar pq se nao colocar o mais 1 da erro no evento sai
+    b.presente = cria_cjt(b.lot);//perguntar pq se nao colocar o mais 1 da erro no evento sai
     b.espera = fila_cria();    
        
     return b;
@@ -272,7 +272,7 @@ void cria_evento_iniciais(struct mundo *m){
     }
     
     /*cria evento fim*/
-    ev = cria_evento(tempo,EV_FIM,NULO,NULO);
+    ev = cria_evento(T_FIM_DO_MUNDO,EV_FIM,NULO,NULO);
     insere_lef(m->linha_do_tempo,ev);
     
 }
@@ -510,13 +510,13 @@ int missao (int T,int MS,struct mundo *m){
 
 void fim(int T,int mc,int mi,struct mundo *m){
 
-    int i,total_m;
+    int i;
     float prct,media; 
     
-    total_m = mi + mc;
-    prct = (float)mc/total_m * 100;
-    media = (float)mi/total_m * 100;
     
+    prct = (float) (mc * 100.0)/m->missoes;
+    media = (float) ((mi * 1.0)/mc);
+    printf("%d,%d \n",mi,mc);
     printf("%6d: FIM \n", T);
        
     for (i = 0; i < m->herois; i++){
@@ -524,7 +524,7 @@ void fim(int T,int mc,int mi,struct mundo *m){
         imprime_cjt(m->h[i].hab);
     }
     
-    /*printf("%d/%d MISSOES CUMPRIDAS (%.2f%%), MEDIA %.2f TENTATIVAS/MISSAO",mc,total_m,prct,media);*/
+    printf("%d/%d MISSOES CUMPRIDAS (%.2f%%), MEDIA %.2f TENTATIVAS/MISSAO",mc,m->missoes,prct,media);
 }     
          
 int main (){
@@ -537,6 +537,8 @@ int main (){
 
     m = cria_mundo();
     cria_evento_iniciais(&m);
+    missao_i = m.missoes;
+    missao_c = 0;
     m.relogio = 0;
     FIM = 0;
     
@@ -581,7 +583,6 @@ int main (){
             case EV_FIM:
                 fim(ev->tempo,missao_c,missao_i,&m);
                 FIM = 1;
-                break;
         }
         ev = destroi_evento(ev);
     }

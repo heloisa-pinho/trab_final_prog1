@@ -53,9 +53,10 @@ struct lef_t *destroi_lef (struct lef_t *l){
     while ( nodo != NULL){
         aux = nodo;
         nodo = nodo->prox;
+        free(aux->evento);
         free (aux);
     }
-   
+    
     free(l);
     l = NULL;
     return l;

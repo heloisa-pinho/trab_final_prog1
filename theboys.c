@@ -10,7 +10,7 @@
 #define N_TAMANHO_MUNDO 20000
 #define N_HABILIDADES 10
 #define N_HEROIS N_HABILIDADES * 5
-#define N_BASES N_HEROIS/6
+#define N_BASES N_HEROIS / 6
 #define N_MISSOES T_FIM_DO_MUNDO / 100
 #define NULO -1
 #define EV_CHEGA 0
@@ -29,47 +29,49 @@ struct coordenada {
 };
 
 struct heroi {
-    int ID;                   /*identificacao*/
-    struct conjunto *hab;      /*habilidades*/
-    int pac;                  /*paciencia*/
-    int vel;                  /*velocidade*/
-    int exp;                  /*experiencia*/
-    int base;                 /*ID da base*/
+    int ID;                         /*identificacao*/
+    struct conjunto *hab;           /*habilidades*/
+    int pac;                        /*paciencia*/
+    int vel;                        /*velocidade*/
+    int exp;                        /*experiencia*/
+    int base;                       /*ID da base*/
 };
 
 struct base {
-    int ID;                  
-    int lot;                  
-    struct conjunto *presente;    
-    struct fila *espera;
-    struct coordenada local;
+    int ID;                         /*identificacao*/
+    int lot;                        /*lotacao*/
+    struct conjunto *presente;      /*conjunto da id dos herois presentes na base*/   
+    struct fila *espera;            /*fila de espera para entrar na bese*/
+    struct coordenada local;        /*local da base*/
 };
 
 struct missao {
-    int ID;
-    struct conjunto *hab;
-    struct coordenada local;
+    int ID;                         /*identificacao*/
+    struct conjunto *hab;           /*habilidades necessarias para a missao*/
+    struct coordenada local;        /*local da missao*/
 };
 
 struct mundo {
-    int herois;
-    struct heroi h[N_HEROIS];
-    int bases;
-    struct base b[N_BASES];
-    int missoes;
-    struct missao ms[N_MISSOES];
-    int habilidades;
-    struct conjunto *hab;
-    struct lef_t *linha_do_tempo;
-    int tam_mundo;
-    int relogio;
+    int herois;                     /*numero de herois no mundo*/
+    struct heroi h[N_HEROIS];       /*vetor com todos os herois*/
+    int bases;                      /*numero de bases no mundo*/
+    struct base b[N_BASES];         /*vetor com todos as bases*/
+    int missoes;                    /*numero total de missoes*/
+    struct missao ms[N_MISSOES];    /*vetor com todas as missoes*/
+    int habilidades;                /*numero total de habilidades*/
+    struct conjunto *hab;           /*conjunto com todas as habilidades*/
+    struct lef_t *linha_do_tempo;   /*lef com os eventos*/
+    int tam_mundo;                  /*tamanho do mundo*/
+    int relogio;                    /*tempo do mundo*/
 };
 
+/*seleciona um numero aleatoria*/
 int aleat (int min, int max){
 
     return (min + rand()%(max+1-min));
 };
 
+/*calcula e retorna a distancia entre dois pontos no plano cartesiano*/
 int distancia_cartesiana(struct coordenada B,struct coordenada D){
 
     int distancia;
@@ -79,9 +81,9 @@ int distancia_cartesiana(struct coordenada B,struct coordenada D){
     return distancia;
 };
    
-/*criacao das estruturas*/
+/*---inicializacao das estruturas---*/
 
-struct heroi cria_heroi(int ID,struct mundo m){
+struct heroi cria_heroi(int ID,struct mundo *m){
 
     struct heroi h;
    
@@ -89,7 +91,7 @@ struct heroi cria_heroi(int ID,struct mundo m){
     h.exp = 0;
     h.pac = aleat(0,100);
     h.vel = aleat(50,5000);
-    h.hab = cria_subcjt_cjt(m.hab,aleat(1,3));
+    h.hab = cria_subcjt_cjt(m->hab,aleat(1,3));
     h.base = NULO;
    
     return h;
@@ -103,7 +105,7 @@ struct base cria_base(int ID){
     b.local.x = aleat(0,N_TAMANHO_MUNDO - 1);
     b.local.y = aleat(0,N_TAMANHO_MUNDO - 1);
     b.lot = aleat(3,10);
-    b.presente = cria_cjt(b.lot);//perguntar pq se nao colocar o mais 1 da erro no evento sai
+    b.presente = cria_cjt(b.lot);
     b.espera = fila_cria();    
        
     return b;
@@ -144,7 +146,7 @@ struct mundo cria_mundo (){
    
     m.herois = N_HEROIS;
     for (i = 0; i < m.herois; i++)
-        m.h[i] = cria_heroi(i,m);
+        m.h[i] = cria_heroi(i,&m);
    
     m.bases = N_BASES;
     for (i = 0; i < m.bases; i++)
@@ -162,7 +164,7 @@ struct mundo cria_mundo (){
     return m;
 }
 
-/*Imprime*/
+/*Imprime
 
 void imprime_heroi(struct heroi h){
 
@@ -219,10 +221,10 @@ void imprime_mundo(struct mundo *m){
     printf("tamanho do mundo:%d\n", m->tam_mundo);
    
     printf("relogio:%d\n", m->relogio);
-}
+}*/
 
-/*destroi*/
 
+/*destroi todas as estruturas do mundo e libera a memoria utilizada*/
 void destroi_mundo(struct mundo *m){
 
     int i;
@@ -249,8 +251,9 @@ void destroi_mundo(struct mundo *m){
 }
        
        
-/*eventos*/
+/*--eventos--*/
 
+/*cria e insere na lef os eventos inicias*/ 
 void cria_evento_iniciais(struct mundo *m){
 
     int i,base,tempo;
@@ -277,6 +280,8 @@ void cria_evento_iniciais(struct mundo *m){
     
 }
 
+
+
 void chega(int T,int H,int B,struct mundo *m){
 
     int esp,card,lot;
@@ -286,9 +291,10 @@ void chega(int T,int H,int B,struct mundo *m){
    
     base = m->b[B];
     heroi = m->h[H];
-    m->h[H].base = B;
     card = cardinalidade_cjt(base.presente);
     lot = base.lot;
+    
+    m->h[H].base = B;
 
     if (( card < lot ) && (fila_vazia(base.espera)))
        esp = 1;
@@ -303,8 +309,7 @@ void chega(int T,int H,int B,struct mundo *m){
     else{
        ev = cria_evento(T,EV_DESISTE,H,B);
        insere_lef(m->linha_do_tempo,ev);
-       printf("%6d: CHEGA  HEROI %2d BASE %d (%2d/%2d) DESISTE\n",T,H,B,card,lot);
-       
+       printf("%6d: CHEGA  HEROI %2d BASE %d (%2d/%2d) DESISTE\n",T,H,B,card,lot);  
     }
 }
 
@@ -515,7 +520,7 @@ void fim(int T,int mc,int mi,struct mundo *m){
     
     
     prct = (float) (mc * 100.0)/m->missoes;
-    media = (float) ((mi * 1.0)/mc);
+    media = (float) mi/mc;
     printf("%d,%d \n",mi,mc);
     printf("%6d: FIM \n", T);
        
@@ -547,42 +552,42 @@ int main (){
         switch(ev->tipo){
         	case EV_CHEGA:
         	    m.relogio = ev->tempo;
-        		chega(ev->tempo,ev->dado1,ev->dado2,&m);
-        		break;
+        	    chega(ev->tempo,ev->dado1,ev->dado2,&m);
+        	    break;
         	case EV_ESPERA:
         	    m.relogio = ev->tempo;
-        		espera(ev->tempo,ev->dado1,ev->dado2,&m);
-        		break;
-            case EV_DESISTE:
-                m.relogio = ev->tempo;
-        		desiste(ev->tempo,ev->dado1,ev->dado2,&m);
-        		break;
+        	    espera(ev->tempo,ev->dado1,ev->dado2,&m);
+        	    break;
+        	case EV_DESISTE:
+        	    m.relogio = ev->tempo;
+        	    desiste(ev->tempo,ev->dado1,ev->dado2,&m);
+        	    break;
         	case EV_AVISA:
         	    m.relogio = ev->tempo;
-        		avisa(ev->tempo,ev->dado1,ev->dado2,&m);
-        		break;
+        	    avisa(ev->tempo,ev->dado1,ev->dado2,&m);
+        	    break;
         	case EV_ENTRA:
         	    m.relogio = ev->tempo;
-        		entra(ev->tempo,ev->dado1,ev->dado2,&m);        		
-        		break;
+        	    entra(ev->tempo,ev->dado1,ev->dado2,&m);        		
+        	    break;
         	case EV_SAI:
         	    m.relogio = ev->tempo;
-        		sai(ev->tempo,ev->dado1,ev->dado2,&m);
-        		break;
+        	    sai(ev->tempo,ev->dado1,ev->dado2,&m);
+        	    break;
         	case EV_VIAJA:
         	    m.relogio = ev->tempo;
-        		viaja(ev->tempo,ev->dado1,ev->dado2,&m);
-        		break;
+        	    viaja(ev->tempo,ev->dado1,ev->dado2,&m);
+        	    break;
            	case EV_MISSAO:
-                m.relogio = ev->tempo;
-                if (missao(ev->tempo,ev->dado1,&m))
-                    missao_c++;
-                else
-                    missao_i++;
-                break;
-            case EV_FIM:
-                fim(ev->tempo,missao_c,missao_i,&m);
-                FIM = 1;
+           	    m.relogio = ev->tempo;
+           	    if (missao(ev->tempo,ev->dado1,&m))
+           	        missao_c++;
+           	    else
+           	        missao_i++;
+           	    break;
+           	case EV_FIM:
+           	    fim(ev->tempo,missao_c,missao_i,&m);
+           	    FIM = 1;
         }
         ev = destroi_evento(ev);
     }
